@@ -1,0 +1,135 @@
+ if (dSigmaAz < 1) // если разницамежду заданным и текущим менье 1 градуса, то останавливаемся.
+           {
+
+               if (stopKeyAz == true) // отправляем единожды пачку команд на остановку за все время пербывания в этом положении. 
+               {
+                   stopKeyAz = false;
+                   oldAz = xMagOpt;
+                   //n2 = 0;
+                   for (int k1 = 0; k1 <= 300; k1++)
+                   {
+
+                       serialPort1.WriteLine("1 0 0"); // тормоз
+                   }
+                  
+                   if (moveDirAz == "0 ") moveDirAz = "1 ";
+                   else moveDirAz = "0 ";
+
+                   
+               }
+             
+            
+
+           }
+           else
+           {
+               stopKeyAz = true; // сброс ключа стопа
+              
+               // калибровочное движение, необходимо для выбора направления вращения двигателя
+               // работает один раз за время переориентации. ключ сбрасывается вручную
+               if (calibrKeyAz == true)
+               {
+
+
+                   calibrKeyAz = false;
+                   oldAz = xMagOpt; // запоминаем точку отправки
+                   // n2++;
+                   serialPort1.WriteLine("1 " + moveDirAz + "255");  // вращаем двигатель на максимальной скорости в предыдущем направлении.
+                   dSigmaOldAz = dSigmaAz;
+                   calibrOldKeyAz = true;
+                   dSigmaOld2Az = dSigmaAz;
+                  
+               }
+
+               else
+               {
+
+                   // двигатель все еще движется в в том же направлении
+                   if (Math.Abs(dSigmaAz - dSigmaOld2Az) >= 2 && calibrOldKeyAz == true) // каждые пол градуса посылаем команды управления.
+                   {
+
+                       calibrOldKeyAz = false;
+                       for (int k1 = 0; k1 <= 300; k1++)
+                       {
+
+                           serialPort1.WriteLine("1 0 0"); // тормоз
+                       }
+                       if (dSigmaAz > dSigmaOldAz) // если ортодрома увеличивается, меняем направление вращения
+                       // на противоположное. 
+                       {
+                           //if (moveDirAz == "0 ") moveDirAz = "1 ";
+                           //else moveDirAz = "0 ";
+
+                       }
+
+                   }
+                   else
+                   {
+                       if (Math.Abs(dSigmaAz - dSigmaOld2Az) >= 5) // если ортодрома увеличивается, меняем направление вращения
+                       //if (Math.Abs(sigmaSample - xAcelOpt) >= 5)
+                       // на противоположное. 
+                       {
+
+
+                           // if (sigmaSample < xAcelOpt)
+                           if (dSigmaAz > dSigmaOld2Az)
+                           {
+                               //n2++;
+
+                               if (moveDirAz == "0 ") moveDirAz = "1 ";
+                               else moveDirAz = "0 ";
+                           }
+                           //sigmaSampleAz = xMagOpt;
+                           dSigmaOld2Az = dSigmaAz;
+                       }
+                       if (Math.Abs(oldAz - xMagOpt) >= 1)
+                       // if (Math.Abs(dSigma - dSigmaOld2) >= 1) // каждые 2 градуса посылаем команды управления.
+                       {
+
+                           // dsigma - ортодрома, кротчайщее расстояние между двумя точками на сфере.
+                           // в нашем случаее - на круге. Преимущество в том, что нет зависимости от
+                           // нахождения начальной точки и конечной в разных плоскостях относительно горизонта.
+                           // т.е. f1=-30 и f2=30, то dsigma = 60; 
+
+
+
+                           // максимальная скорость двигателя, если ортодрома больше 10 градусов
+                           if (dSigmaAz >= 10)
+                           {
+
+
+                               serialPort1.WriteLine("1 " + moveDirAz + "255"); // макс скорость
+
+                           }
+
+                           // линейное замедление при ортодроме < 10
+                           if (dSigmaAz < 10)
+                           {
+
+                               rotSpAz = Convert.ToInt32(135 * (1 - (10 - Math.Abs(az - xMagOpt)) / 10d) + 120); // линейное замедление 
+                               if (rotSpAz > 255) rotSpAz = 255;
+                               serialPort1.WriteLine("1 " + moveDirAz + Convert.ToString(rotSpAz)); // замедление
+
+
+                           }
+
+                           oldAz = xMagOpt;
+                          
+
+                       }
+
+
+
+
+                   }
+               }
+           }
+
+           if (driveRotKey == 2 && stopKeyAz == false)
+           {
+               return true;
+           }
+           else return false;
+       }
+
+

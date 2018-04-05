@@ -1,0 +1,50 @@
+
+           // вращаем по углу места
+           if (Math.Abs(valEl - el) <= 1)
+            {
+               // останавливаем вращение
+              // orientChan = false;
+                serialPort1.WriteLine("0 0 0");
+            }
+          else
+           { 
+               if (Math.Abs(valEl - el) <= 180)
+           { 
+                   
+               if (valEl < el)   //движемся против часовой
+               {
+
+                
+                   if (Math.Abs(el - valEl ) >= 10 )
+				{
+					//rotSp = 255;
+					serialPort1.WriteLine("0 0 255"); // макс скорость
+				}
+				if (Math.Abs(el - valEl ) < 10 )
+				{
+					rotSp = Convert.ToInt32(155*(1-(10 - Math.Abs(el - valEl ) )/10d)+100);
+					serialPort1.WriteLine("0 0 " + Convert.ToString(rotSp) ); // замедление
+				}
+                   
+               }
+
+               if (valEl > el) //движемся ПО часовой
+               {
+
+                  
+                   if (Math.Abs(el - valEl) >= 10)
+                   {
+                       //rotSp = 255;
+                       serialPort1.WriteLine("0 1 255"); ; // макс скорость
+                   }
+                   if (Math.Abs(el - valEl) < 10)
+                   {
+                       rotSp = Convert.ToInt32(155 * (1 - (10 - Math.Abs(el - valEl)) / 10d) + 100);
+                       serialPort1.WriteLine("0 1 " + Convert.ToString(rotSp)); // замедление
+                   }
+                  
+               }
+ 
+
+           }
+           

@@ -1,0 +1,28 @@
+if (heading < val)
+			{
+				if (abs(heading - val) >= 10 )
+				{
+					interval = 255;
+					DriveMoveBack (); // движемся против часовой
+				}
+				if (abs(heading - val) < 10 )
+				{
+					interval = int(155*(1-(10 - abs(heading - val))/10.0)+100);
+					DriveMoveBack (); // движемся против часовой
+				}				
+				
+			}
+			else
+			{
+				if (abs(heading - val) >= 10 )
+				{
+					interval = 255;
+					DriveMoveForward (); // движемся против часовой
+				}
+				if (abs(heading - val) < 10 )
+				{
+					interval = int(155*(1-(10 - abs(heading - val))/10.0)+100);
+					DriveMoveForward (); // движемся против часовой
+				}
+				
+			}

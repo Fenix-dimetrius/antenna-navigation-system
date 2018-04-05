@@ -1,0 +1,120 @@
+#include <string.h>
+int IN3 = 5; // Input3 подключен к выводу 5
+int IN4 = 4;
+int ENB = 3;
+int interval = 0;
+int val;
+char v[31];
+
+void setup()
+{
+	pinMode (ENB, OUTPUT);
+	pinMode (IN3, OUTPUT);
+	pinMode (IN4, OUTPUT);
+	Serial.begin(9600);              //установка порта на скорость 9600 бит/сек
+}
+void loop()
+{
+	
+	
+	//if (Serial.available()) {         //если есть прин€тый символ,
+		//v[1] = Serial.read();            //  то читаем его и сохран€ем в val
+		//Serial.write(v[1]);
+		
+char buffer[100];
+int i=0;
+//если есть данные - читаем
+if(Serial.available()){
+	delay(100);
+	
+	//загон€ем прочитанное в буфер
+	while( Serial.available() && i< 99) {
+		buffer[i++] = Serial.read();
+	}
+	//закрываем массив
+	buffer[i++]='\0';
+}
+val = atoi(strtok(buffer," "));
+//Serial.println("  " + String(val));	
+
+switch(val)
+{
+	case 1:
+	{
+		analogWrite(ENB,0);
+		delay(500);
+		// Ќа пару выводов "IN" поданы разноименные сигналы, мотор готов к вращаению
+		digitalWrite (IN3, HIGH);
+		digitalWrite (IN4, LOW);
+
+	}
+	break;
+	case 2:
+	{
+	analogWrite(ENB,0);
+	delay(500);
+	digitalWrite (IN3, LOW);
+	digitalWrite (IN4, HIGH);
+	}
+	break;
+	case 0:
+	{
+	interval = 0;
+	}
+	break;
+	default :
+	{
+	interval = val;
+	}
+	break;
+}	
+		//if (v[1] == '2') {
+			//analogWrite(ENB,0);
+			//delay(500);
+			//// Ќа пару выводов "IN" поданы разноименные сигналы, мотор готов к вращаению
+			//digitalWrite (IN3, HIGH);
+			//digitalWrite (IN4, LOW);
+			//
+			//
+		//}
+		//if (v[1] == '1') {
+			//analogWrite(ENB,0);
+			//delay(500);
+			//digitalWrite (IN3, LOW);
+			//digitalWrite (IN4, HIGH);
+			//
+		//}
+//
+//
+		//
+		//if (v[1] == '+') {               //  если прин€т симовол 'H',...
+			//if (interval == 255)
+			//{
+				//interval = 255;
+			//}
+			//else
+			//{
+				//interval = interval + 5;
+			//}
+			//
+			//Serial.println("interval: " + String(interval));
+		//}
+		//if (v[1] == '-')
+		//{               //  если прин€т симовол 'L',
+			//if (interval == 0)
+			//{
+				//interval = 0;
+				//Serial.println("interval: " + String(interval));
+			//}
+			//else
+			//{
+				//interval = interval - 5;
+			//}
+			//Serial.println("interval: " + String(interval));
+		//}
+
+
+	
+	// подаем на вывод ENB управл€юший Ў»ћ сигнал
+	analogWrite(ENB,interval);
+}
